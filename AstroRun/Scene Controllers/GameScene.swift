@@ -41,10 +41,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             player.position.y = frame.maxY - 20
         }
         
-        if player.position.x < frame.minX {
-            player.position.x = frame.minX + 20
-        }
-        
         for child in children{
             if child.frame.maxX < frame.minX {
                 if !frame.intersects(child.frame){
@@ -82,11 +78,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             speedMultiplier *= 1.05
             lastCreatedTimestamp = currentTime
             
-            DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-                guard let `self` = self else { return }
-
-                self.createObstacles()
-            }
+            createObstacles()
         }
     }
     
@@ -129,10 +121,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         guard isPlayerAlive else { return }
         
         for _ in 0 ..< 10 {
-            let obstacleStartY = CGFloat.random(in: frame.minY ..< frame.maxY)
+                
+            let obstacleStartY = CGFloat.random(in: `self`.frame.minY ..< `self`.frame.maxY)
             let obstacleStartX = CGFloat(1050) + CGFloat.random(in: 0 ..< 1000)
             
-            let newObstacle = ObstacleNode(speedMultiplier: self.speedMultiplier, startPosition: CGPoint(x: obstacleStartX, y: obstacleStartY))
+            let newObstacle = ObstacleNode(speedMultiplier: `self`.speedMultiplier, startPosition: CGPoint(x: obstacleStartX, y: obstacleStartY))
             
             self.addChild(newObstacle)
         }

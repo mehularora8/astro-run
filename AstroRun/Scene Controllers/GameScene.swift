@@ -6,6 +6,15 @@
 //  Copyright © 2020 Mehul Arora. All rights reserved.
 //
 
+/*
+ Future TODO:
+ 
+ - Add settings for difficulty - change speed multiplier accordingly
+ - Add Game Center support potentially?
+ - Implement multiple lives and playerInvincible
+ - Add ingame points and skins
+ */
+
 import SpriteKit
 import GameplayKit
 
@@ -21,10 +30,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var speedMultiplier = 1.0
     var isPlayerInvincible = false
     var lastInvincibleTimestamp : TimeInterval = 0
-    
-    /* Helper variables */
-    var lastCreatedTimestamp : TimeInterval? = nil
-    var scoreCount = 0
     
     var scoreLabel = SKLabelNode()
     
@@ -49,14 +54,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             }
         }
         
-        scoreCount += 1
-        
-        if scoreCount % 4 == 0{
-            score += 1
-            scoreLabel.text = "Score: \(score)"
-        }
-        
-        scoreCount = scoreCount % 60
+        score = Int((score + 1) / 4)
         
         if score > level * 400 {
             self.backgroundColor = colors[level % colors.count]
@@ -65,21 +63,25 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
         let activeObstacles = children.compactMap( { $0 as? ObstacleNode })
         
-        var delta = Double(0)
+//        var delta = Double(0)
+//
+//        if let _ = lastCreatedTimestamp {
+//            delta = currentTime - lastCreatedTimestamp!
+//        } else{
+//            delta = 1
+//            lastCreatedTimestamp = currentTime
+//        }
         
-        if let _ = lastCreatedTimestamp {
-            delta = currentTime - lastCreatedTimestamp!
-        } else{
-            delta = 1
-            lastCreatedTimestamp = currentTime
-        }
-        
-        if activeObstacles.count == 0 && delta >= 1 {
-            speedMultiplier *= 1.05
-            lastCreatedTimestamp = currentTime
-            
+        if activeObstacles.count < 12 {
             createObstacles()
         }
+        
+//        if activeObstacles.count == 0 && delta >= 1 {
+//            speedMultiplier *= 1.05
+//            lastCreatedTimestamp = currentTime
+//
+//            createObstacles()
+//        }
     }
     
     override func didMove(to view: SKView) {
@@ -120,15 +122,15 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     func createObstacles() {
         guard isPlayerAlive else { return }
         
-        for _ in 0 ..< 10 {
+//        for _ in 0 ..< 10 {
                 
-            let obstacleStartY = CGFloat.random(in: `self`.frame.minY ..< `self`.frame.maxY)
-            let obstacleStartX = CGFloat(1050) + CGFloat.random(in: 0 ..< 1000)
+        let obstacleStartY = CGFloat.random(in: `self`.frame.minY ..< `self`.frame.maxY)
+        let obstacleStartX = CGFloat(1050) + CGFloat.random(in: 0 ..< 1000)
             
-            let newObstacle = ObstacleNode(speedMultiplier: `self`.speedMultiplier, startPosition: CGPoint(x: obstacleStartX, y: obstacleStartY))
+        let newObstacle = ObstacleNode(speedMultiplier: `self`.speedMultiplier, startPosition: CGPoint(x: obstacleStartX, y: obstacleStartY))
             
-            self.addChild(newObstacle)
-        }
+        self.addChild(newObstacle)
+//        }
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -181,7 +183,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         self.isPlayerAlive = false
         
         let over = SKSpriteNode(imageNamed: "gameOver")
-        over.position = CGPoint(x: self.size.width / 2, y: 3 * self.size.height / 4)
+        over.position = CGPoint(x: self.size.width / 2, y: 2 * self.size.height / 3)
         addChild(over)
         
         scoreLabel.position = CGPoint(x: self.size.width / 2, y : self.size.height / 3)
